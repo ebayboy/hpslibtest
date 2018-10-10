@@ -1,10 +1,10 @@
 
-EXE?= test                                                                                   
+EXE?= hpslibtest
 STATIC_EXE ?= static_$(EXE)
 
 INCL := -I./include/
 LIB  := -L./lib/
-LIB_NAME := test
+LIB_NAME :=  hpslib
 
 all: static_app
 

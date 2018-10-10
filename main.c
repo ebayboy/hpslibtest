@@ -1,9 +1,12 @@
 #include <stdio.h>
 
+#include "hpslib.h"
 
 int main(int argc, char **args)
 {
-    print("hello world!\n");
+    printf("hello world!\n");
+
+    libtest();
 
     return 0;
 }
