@@ -1,13 +1,15 @@
 
 EXE?= hpslibtest
-STATIC_EXE ?= static_$(EXE)
+STATIC_EXE ?= $(EXE)
 
 INCL := -I./include/
 LIB_NAME := ./lib/hpslib.a
 
-all: static_app
+all: app
 
-static_app: 
+DEBUG = -g -ggdb
+
+app: 
 	$(CC) main.c $(INCL) $(LIB_NAME) -o $(STATIC_EXE)
 
 clean:
