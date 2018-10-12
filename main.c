@@ -9,7 +9,9 @@ int main(int argc, char **args)
 
     libtest();
 
-    cfg_parser_parse();
+    int rc = cfg_parser_parse("hpslib.json");
+
+    printf("rc=%d\n", rc);
 
     return 0;
 }
