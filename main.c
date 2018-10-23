@@ -35,5 +35,8 @@ int main(int argc, char **args)
         free(wafcfg);
     }
 
+
+    waf_fini();
+
     return 0;
 }
