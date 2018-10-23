@@ -16,25 +16,9 @@ int main(int argc, char **args)
 
     int rc = 0;
 
-    if (waf_init("/var/log/waf.log") == -1) {
+    if (waf_init("/var/log/waf.log", "hpslib.json") == -1) {
         return -1;
     }
-
-    waf_config_t *waf_config = NULL;
-
-    if ((waf_config = malloc(sizeof(waf_config_t))) == NULL) {
-        return -1;
-    }
-    memset(waf_config, 0, sizeof(waf_config));
-
-    rc = waf_config_init(filename, waf_config);
-
-    printf("rc=%d\n", rc);
-
-    if (waf_config) {
-        free(waf_config);
-    }
-
 
     waf_fini();
 
