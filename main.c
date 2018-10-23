@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "hpslib.h"
-#include "cfg_parser.h"
+#include "waf_config.h"
 #include "waf.h"
 #include "common.h"
 
@@ -20,19 +20,19 @@ int main(int argc, char **args)
         return -1;
     }
 
-    wafcfg_t *wafcfg = NULL;
+    waf_config_t *waf_config = NULL;
 
-    if ((wafcfg = malloc(sizeof(wafcfg_t))) == NULL) {
+    if ((waf_config = malloc(sizeof(waf_config_t))) == NULL) {
         return -1;
     }
-    memset(wafcfg, 0, sizeof(wafcfg));
+    memset(waf_config, 0, sizeof(waf_config));
 
-    rc = cfg_parser_parse(filename, wafcfg);
+    rc = waf_config_init(filename, waf_config);
 
     printf("rc=%d\n", rc);
 
-    if (wafcfg) {
-        free(wafcfg);
+    if (waf_config) {
+        free(waf_config);
     }
 
 
