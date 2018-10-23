@@ -4,6 +4,8 @@
 
 #include "hpslib.h"
 #include "cfg_parser.h"
+#include "waf.h"
+#include "common.h"
 
 int main(int argc, char **args)
 {
@@ -14,19 +16,23 @@ int main(int argc, char **args)
 
     int rc = 0;
 
-    waf_t *waf = NULL;
-
-    if ((waf = malloc(sizeof(waf_t))) == NULL) {
+    if (waf_init("/var/log/waf.log") == -1) {
         return -1;
     }
-    memset(waf, 0, sizeof(waf));
 
-    rc = cfg_parser_parse(filename, waf);
+    wafcfg_t *wafcfg = NULL;
+
+    if ((wafcfg = malloc(sizeof(wafcfg_t))) == NULL) {
+        return -1;
+    }
+    memset(wafcfg, 0, sizeof(wafcfg));
+
+    rc = cfg_parser_parse(filename, wafcfg);
 
     printf("rc=%d\n", rc);
 
-    if (waf) {
-        free(waf);
+    if (wafcfg) {
+        free(wafcfg);
     }
 
     return 0;
