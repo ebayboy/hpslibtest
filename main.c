@@ -16,10 +16,17 @@ int main(int argc, char **args)
 
     int rc = 0;
 
+    /* 1. init */
     if (waf_init("/var/log/waf.log", "hpslib.json") == -1) {
         return -1;
     }
 
+    /* 2. show */
+//    waf_show();
+
+    /* 3. waf_match */
+
+    /* 4. waf_fini */
     waf_fini();
 
     return 0;
