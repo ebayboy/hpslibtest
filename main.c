@@ -22,7 +22,7 @@ int main(int argc, char **args)
     }
 
     /* 2. show */
-//    waf_show();
+    waf_show();
 
     /* 3. waf_match */
 
