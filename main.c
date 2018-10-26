@@ -26,6 +26,15 @@ int main(int argc, char **args)
 
     /* 3. waf_match */
 
+    char *buff = "aaa/etc/passwd/111";
+    int matched_rule_id = 0;
+    rc = waf_match("u_uri",
+            "aaa/etc/passwd/111",
+            strlen(buff), 
+            &matched_rule_id);
+
+    printf("rc=%d matched_rule_id:%d\n", rc, matched_rule_id);
+
     /* 4. waf_fini */
     waf_fini();
 
