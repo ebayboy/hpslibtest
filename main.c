@@ -26,10 +26,10 @@ int main(int argc, char **args)
 
     /* 3. waf_match */
 
-    char *buff = "aaa/etc/passwd/111";
+    char *buff = "http://192.168.137.200/?name=/etc/passwd";
     int matched_rule_id = 0;
-    rc = waf_match("u_uri",
-            "aaa/etc/passwd/111",
+    rc = waf_match("$u_uri",
+            buff, 
             strlen(buff), 
             &matched_rule_id);
 
