@@ -24,13 +24,30 @@ int main()
     char *uri = "http://192.168.137.200/?name=/etc/passwd";
     char *args = "name=/etc/passwd&a=b";
     char *request_body = NULL;
-
-    /* add header var */
-
     void *data =  waf_data_create(HTTP_GET, uri, strlen(uri), args, strlen(args), request_body, 0);
 
-    /* 3. waf_match */
+    /* add header var */
+    char *ua = "user-agent-/etc/passwd112233";
+    if (waf_data_add_param(data,
+            PARAM_HDR_TYPE,
+            WAF_HDR_UA, strlen(WAF_HDR_UA),
+            ua , strlen(ua)) == -1) {
+        fprintf(stderr, "Error: waf_data_add_param ua error.");
+        goto out;
+    }
 
+    char *referer = "referer-/etc/passwd445566";
+    if (waf_data_add_param(data,
+            PARAM_HDR_TYPE,
+            WAF_HDR_REFERER, strlen(WAF_HDR_REFERER),
+            referer , strlen(referer)) == -1) {
+        fprintf(stderr, "Error: waf_data_add_param referer error.");
+        goto out;
+    }
+
+    //waf_data_show(data);
+
+    /* 3. waf_match */
     int matched_rule_id = 0;
 
     rc = waf_match(data, &matched_rule_id);
@@ -39,6 +56,8 @@ int main()
     if (data) {
         waf_data_destroy(data);
     }
+
+out:
 
     /* 4. waf_fini */
     waf_fini();
