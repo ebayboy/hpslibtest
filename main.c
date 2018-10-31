@@ -45,7 +45,7 @@ int main()
         goto out;
     }
 
-    //waf_data_show(data);
+    waf_data_show(data);
 
     /* 3. waf_match */
     int matched_rule_id = 0;
