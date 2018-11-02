@@ -26,7 +26,7 @@ int main()
     char *request_body = NULL;
     void *data =  waf_data_create(HTTP_GET, uri, strlen(uri), args, strlen(args), request_body, 0);
 
-    /* add header var */
+    /* add header */
     char *ua = "user-agent-/etc/passwd112233";
     if (waf_data_add_param(data,
             PARAM_HDR_TYPE,
@@ -45,6 +45,7 @@ int main()
         goto out;
     }
 
+    /* waf data show */
     waf_data_show(data);
 
     /* 3. waf_match */
