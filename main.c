@@ -26,10 +26,23 @@ int main()
     char *uri = "http://192.168.137.200/";
     char *args = "";
     char *request_body = NULL;
-    void *data =  waf_data_create(HTTP_GET, uri, strlen(uri), args, strlen(args), request_body, 0);
+    //char *cookies = "JSESSIONID=04E6A4158F97C7824052A816691FA0D0;a=%20f%20b;c=d;";
+    char *cookies = "";
+    void *data =  waf_data_create(HTTP_GET, uri, strlen(uri), 
+            args, strlen(args), cookies, strlen(cookies), request_body, 0);
 
+    char *tmp = "tmp12\%203abc";
+    if (waf_data_add_param(data,
+            PARAM_HDR_TYPE,
+            "tmp", strlen(tmp),
+            tmp , strlen(tmp)) == -1) {
+        fprintf(stderr, "Error: waf_data_add_param ua error.");
+        goto out;
+    }
+
+#if 0
     /* add header */
-    char *ua = "user-agent-/etc/passwd112233";
+    char *ua = "1122\%20334455";
     if (waf_data_add_param(data,
             PARAM_HDR_TYPE,
             WAF_HDR_UA, strlen(WAF_HDR_UA),
@@ -38,7 +51,8 @@ int main()
         goto out;
     }
 
-    char *referer = "referer-/etc/passwd445566";
+    //char *referer = "referer-/etc/passwd445566";
+    char *referer = "referer";
     if (waf_data_add_param(data,
             PARAM_HDR_TYPE,
             WAF_HDR_REFERER, strlen(WAF_HDR_REFERER),
@@ -50,12 +64,22 @@ int main()
     /* add var */
     char *referer_var = "$http_referer";
     if (waf_data_add_param(data,
-            PARAM_VAR_TYPE,
+            PARAM_MZ_TYPE,
             referer_var, strlen(referer_var), 
             WAF_HDR_REFERER, strlen(WAF_HDR_REFERER)) == -1) {
         fprintf(stderr, "Error: waf_data_add_param referer var error.");
         goto out;
     }
+
+    char *ua_var = "$u_user_agent";
+    if (waf_data_add_param(data,
+                PARAM_MZ_TYPE,
+                ua_var, strlen(ua_var), 
+                WAF_HDR_UA, strlen(WAF_HDR_UA)) == -1) {
+        fprintf(stderr, "Error: waf_data_add_param referer var error.");
+        goto out;
+    }
+#endif
 
     /* waf data show */
     waf_data_show(data);
