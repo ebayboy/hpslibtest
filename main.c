@@ -21,8 +21,10 @@ int main()
     waf_show();
 
     /* waf data */
-    char *uri = "http://192.168.137.200/?name=/etc/passwd";
-    char *args = "name=/etc/passwd&a=b";
+    //char *uri = "http://192.168.137.200/?name=/etc/passwd";
+    //char *args = "name=/etc/passwd&a=b";
+    char *uri = "http://192.168.137.200/";
+    char *args = "";
     char *request_body = NULL;
     void *data =  waf_data_create(HTTP_GET, uri, strlen(uri), args, strlen(args), request_body, 0);
 
