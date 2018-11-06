@@ -15,6 +15,7 @@
 int main()
 {
     char *filename="hpslib.json";
+    char *testconf="test.json";
     int rc = 0;
 
     /* 1. init */
@@ -33,6 +34,8 @@ int main()
     char *request_body = "a=1122 3344&c=d";
     //char *cookies = "a=1122%203344;c=d;";
     char *cookies = "";
+
+
     void *data =  waf_data_create(HTTP_GET, uri, strlen(uri), 
             args, strlen(args), cookies, strlen(cookies), request_body, strlen(request_body));
 

@@ -1,0 +1,70 @@
+{
+    "args"  : "args1",  
+    "uri"  : "uri1",
+    "request_body"      : "request_body1",
+    "cookies"      : "cookies",
+
+    "headers": 
+    [
+        {   
+            "key": "Referer",
+            "value": "Referer1"
+        },
+        {   
+            "key": "User-Agent",
+            "value": "User-Agent1"
+        }
+    ],
+
+    "vars": 
+    [
+        {   
+            "key": "url",
+            "value": "http://192.168.137.200/?key1=v al1&key2=val2"
+        },
+        {   
+            "key": "u_url",
+            "value": "http://192.168.137.200/?key1=v%20al1&key2=val2"
+        },
+        {   
+            "key": "request_uri",
+            "value": "/foo/?key1=v%20al1&key2=val2"
+        }
+    ],
+
+    "mzs": 
+    [
+        {   
+            "key": "$url",
+            "value": "url"
+        },
+        {   
+            "key": "$u_url",
+            "value": "u_url"
+        },
+        {   
+            "key": "$http_referer",
+            "value": "Referer"
+        },
+        {   
+            "key": "$u_http_referer",
+            "value": "Referer"
+        },
+        {   
+            "key": "$http_user_agent",
+            "value": "User-Agent"
+        },
+        {   
+            "key": "$u_http_user_agent",
+            "value": "User-Agent"
+        },
+        {   
+            "key": "$request_uri",
+            "value": "request_uri"
+        },
+        {   
+            "key": "$u_request_uri",
+            "value": "request_uri"
+        }
+    ]
+}
