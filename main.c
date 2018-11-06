@@ -2,9 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-//#include "waf_config.h"
 #include "waf.h"
-//#include "common.h"
+#include "cJSON.h"
+#include "log.h"
 
 int main()
 {
@@ -24,10 +24,11 @@ int main()
     //char *uri = "http://192.168.137.200/?name=/etc/passwd";
     char *args = "";
     char *uri = "http://192.168.137.200/";
-    char *request_body = NULL;
-    char *cookies = "a=1122%203344;c=d;";
+    char *request_body = "a=1122 3344&c=d";
+    //char *cookies = "a=1122%203344;c=d;";
+    char *cookies = "";
     void *data =  waf_data_create(HTTP_GET, uri, strlen(uri), 
-            args, strlen(args), cookies, strlen(cookies), request_body, 0);
+            args, strlen(args), cookies, strlen(cookies), request_body, strlen(request_body));
 
     char *tmp = "tmp12\%203abc";
     if (waf_data_add_param(data,
