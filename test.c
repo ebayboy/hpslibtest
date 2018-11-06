@@ -12,11 +12,123 @@
 #include "cJSON.h"
 #include "log.h"
 
+static int test_load_config(const char *filename, void **data)
+{
+    long temp_len = 0;
+    FILE *fp = NULL;
+    char *temp = NULL;
+    cJSON *root = NULL, *it = NULL;
+    int ret = 0;
+
+    if (filename == NULL || strlen(filename) == 0) {
+        return -1;
+    }
+
+    if ((fp = fopen(filename, "r")) == NULL) {
+        return -1;
+    }
+
+    if ((temp_len = fsize(fp)) == -1) {
+        return -1;
+    }
+
+    log_info("temp_len:%d\n", temp_len);
+    if ((temp = (char*)malloc(temp_len + 1)) == NULL) {
+        ret = -1;
+        goto out;
+    }
+    memset(temp, 0, sizeof(temp));
+
+    if (fread(temp, temp_len, 1, fp) != 1) {
+        ret = -1;
+        goto out;
+    }
+
+    log_info("file content:[%s]\n", temp);
+    if ((root = cJSON_Parse(temp)) == NULL) {
+        ret = -1;
+        goto out;
+    }
+
+    char *args = NULL, *uri = NULL, *request_body = NULL, *cookies = NULL;
+
+    if ((it = cJSON_GetObjectItem(root,"args")) != NULL) {
+        args = strdup(it->valuestring);
+    }
+
+    if ((it = cJSON_GetObjectItem(root,"uri")) != NULL) {
+        uri = strdup(it->valuestring);
+    }
+ 
+    if ((it = cJSON_GetObjectItem(root,"cookies")) != NULL) {
+        cookies = strdup(it->valuestring);
+    }
+  
+    if ((it = cJSON_GetObjectItem(root,"request_body")) != NULL) {
+        request_body = strdup(it->valuestring);
+    }
+
+    *data = waf_data_create(HTTP_GET, uri, strlen(uri), 
+            args, strlen(args), cookies, strlen(cookies), 
+            request_body, strlen(request_body));
+    if (*data == NULL) {
+        return -1;
+    }
+
+    /* load header */
+
+
+out:
+
+    if (args) {
+        free(args);
+    }
+
+    if (uri) {
+        free(uri);
+    }
+
+    if (request_body) {
+        free(request_body);
+    }
+
+    if (cookies) {
+        free(cookies);
+    }
+
+    if (fp) {
+        fclose(fp);
+    }
+
+    if (root) {
+        cJSON_Delete(root);
+    }
+
+    if (temp) {
+        free(temp);
+    }
+    
+    return ret;
+}
+
+
 int main()
 {
     char *filename="hpslib.json";
     char *testconf="test.json";
+    char *log_file="/var/log/waf_test.log";
     int rc = 0;
+
+    /*set log */
+    FILE *log_fp = NULL;
+
+
+    if ((log_fp = fopen(log_file, "a+")) == NULL) {
+        fprintf(stderr, "open log file [%s] error.\n", log_file);
+        return -1;
+    }
+
+    log_set_fp(log_fp);
 
     /* 1. init */
     if (waf_init("/var/log/waf.log", "hpslib.json") == -1) {
@@ -27,19 +139,21 @@ int main()
     /* 2. show */
     waf_show();
 
-    /* waf data */
-    //char *uri = "http://192.168.137.200/?name=/etc/passwd";
+    /* load test.json */
     char *args = "";
-    char *uri = "http://192.168.137.200/";
-    char *request_body = "a=1122 3344&c=d";
-    //char *cookies = "a=1122%203344;c=d;";
+    char *uri = "";
+    char *request_body = "";
     char *cookies = "";
 
+    void *data;
+        
+    if (test_load_config(testconf, &data) == -1) {
+        rc = -1;
+        goto out;
+    }
 
-    void *data =  waf_data_create(HTTP_GET, uri, strlen(uri), 
-            args, strlen(args), cookies, strlen(cookies), request_body, strlen(request_body));
-
-    char *tmp = "tmp12\%203abc";
+#if 0
+        char *tmp = "tmp12\%203abc";
     if (waf_data_add_param(data,
             PARAM_HDR_TYPE,
             "tmp", strlen(tmp),
@@ -48,7 +162,6 @@ int main()
         goto out;
     }
 
-#if 0
     /* add header */
     char *ua = "1122\%20334455";
     if (waf_data_add_param(data,
@@ -106,6 +219,9 @@ out:
 
     /* 4. waf_fini */
     waf_fini();
+    if (log_fp) {
+        fclose(log_fp);
+    }
 
     return 0;
 }
