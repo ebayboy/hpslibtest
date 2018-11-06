@@ -12,7 +12,93 @@
 #include "cJSON.h"
 #include "log.h"
 
-static int test_load_config(const char *filename, void **data)
+typedef struct {
+    char *method;
+    char *uri;
+    char *args;
+    char *cookies;
+    char *request_body;
+} test_config_t;
+
+static void test_config_free(test_config_t *cfg)
+{
+    if (cfg == NULL) {
+        return ;
+    }
+
+#define CFG_FREE(x) \
+    if (cfg->x) {  \
+        free(cfg->x);  \
+    }
+
+    CFG_FREE(method);
+    CFG_FREE(args);
+    CFG_FREE(uri);
+    CFG_FREE(request_body);
+
+#undef CFG_FREE
+}
+
+static void test_config_show(test_config_t *cfg)
+{
+    if (cfg == NULL) {
+        return;
+    }
+
+#define CFG_PRT(x) \
+    if (cfg->x) {   \
+        log_info("method:[%s]", cfg->x);   \
+    }
+
+    CFG_PRT(method);
+    CFG_PRT(args);
+    CFG_PRT(uri);
+    CFG_PRT(request_body);
+
+#undef CFG_PRT
+
+}
+
+static int test_get_method(const char *method)
+{
+    if (strcasecmp(method, "HTTP_GET") == 0) {
+        return HTTP_GET;
+    } else if (strcasecmp(method, "HTTP_HEAD") == 0) {
+        return HTTP_HEAD; 
+    } else if (strcasecmp(method, "HTTP_POST") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_PUT") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_DELETE") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_MKCOL") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_COPY") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_MOVE") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_OPTIONS") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_PROPFIND") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_PROPPATCH") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_LOCK") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_UNLOCK") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_PATCH") == 0) {
+
+    } else if (strcasecmp(method, "HTTP_TRACE") == 0) {
+
+    } else {
+        return HTTP_UNKNOWN;
+    }
+
+    return HTTP_UNKNOWN;
+}
+
+static int test_load_config(test_config_t *cfg, const char *filename, void **data)
 {
     long temp_len = 0;
     FILE *fp = NULL;
@@ -50,51 +136,40 @@ static int test_load_config(const char *filename, void **data)
         goto out;
     }
 
-    char *args = NULL, *uri = NULL, *request_body = NULL, *cookies = NULL;
+    if ((it = cJSON_GetObjectItem(root,"method")) != NULL) {
+        cfg->method = strdup(it->valuestring);
+    }
 
     if ((it = cJSON_GetObjectItem(root,"args")) != NULL) {
-        args = strdup(it->valuestring);
+        cfg->args = strdup(it->valuestring);
     }
 
     if ((it = cJSON_GetObjectItem(root,"uri")) != NULL) {
-        uri = strdup(it->valuestring);
+        cfg->uri = strdup(it->valuestring);
     }
  
     if ((it = cJSON_GetObjectItem(root,"cookies")) != NULL) {
-        cookies = strdup(it->valuestring);
+        cfg->cookies = strdup(it->valuestring);
     }
   
     if ((it = cJSON_GetObjectItem(root,"request_body")) != NULL) {
-        request_body = strdup(it->valuestring);
+        cfg->request_body = strdup(it->valuestring);
     }
 
-    *data = waf_data_create(HTTP_GET, uri, strlen(uri), 
-            args, strlen(args), cookies, strlen(cookies), 
-            request_body, strlen(request_body));
+    test_config_show(cfg);
+
+    *data = waf_data_create(test_get_method(
+                cfg->method), cfg->uri, strlen(cfg->uri), 
+            cfg->args, strlen(cfg->args), 
+            cfg->cookies, strlen(cfg->cookies), 
+            cfg->request_body, strlen(cfg->request_body));
     if (*data == NULL) {
         return -1;
     }
 
     /* load header */
 
-
 out:
-
-    if (args) {
-        free(args);
-    }
-
-    if (uri) {
-        free(uri);
-    }
-
-    if (request_body) {
-        free(request_body);
-    }
-
-    if (cookies) {
-        free(cookies);
-    }
 
     if (fp) {
         fclose(fp);
@@ -146,9 +221,20 @@ int main()
     char *cookies = "";
 
     void *data;
+
+    test_config_t cfg;
+
+    memset(&cfg, 0, sizeof(cfg));
         
-    if (test_load_config(testconf, &data) == -1) {
+    if (test_load_config(&cfg, testconf, &data) == -1) {
         rc = -1;
+        goto out;
+    }
+
+    test_config_show(&cfg);
+
+    if (data == NULL) {
+        log_error("Error: data is NULL!");
         goto out;
     }
 
@@ -222,6 +308,8 @@ out:
     if (log_fp) {
         fclose(log_fp);
     }
+
+    test_config_free(&cfg);
 
     return 0;
 }

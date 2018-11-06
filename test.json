@@ -1,8 +1,9 @@
 {
+    "method"  : "HTTP_GET",  
     "args"  : "args1",  
     "uri"  : "uri1",
     "request_body"      : "request_body1",
-    "cookies"      : "cookies",
+    "cookies"      : "cookies1",
 
     "headers": 
     [
