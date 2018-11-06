@@ -22,12 +22,10 @@ int main()
 
     /* waf data */
     //char *uri = "http://192.168.137.200/?name=/etc/passwd";
-    //char *args = "name=/etc/passwd&a=b";
+    char *args = "";
     char *uri = "http://192.168.137.200/";
-    char *args = "path=/22%2033/passwd";
     char *request_body = NULL;
-    //char *cookies = "JSESSIONID=04E6A4158F97C7824052A816691FA0D0;a=%20f%20b;c=d;";
-    char *cookies = "";
+    char *cookies = "a=1122%203344;c=d;";
     void *data =  waf_data_create(HTTP_GET, uri, strlen(uri), 
             args, strlen(args), cookies, strlen(cookies), request_body, 0);
 
