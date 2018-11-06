@@ -24,7 +24,7 @@ int main()
     //char *uri = "http://192.168.137.200/?name=/etc/passwd";
     //char *args = "name=/etc/passwd&a=b";
     char *uri = "http://192.168.137.200/";
-    char *args = "";
+    char *args = "path=/22%2033/passwd";
     char *request_body = NULL;
     //char *cookies = "JSESSIONID=04E6A4158F97C7824052A816691FA0D0;a=%20f%20b;c=d;";
     char *cookies = "";
