@@ -11,6 +11,14 @@
 #include "waf.h"
 #include "cJSON.h"
 #include "log.h"
+#include "list.h"
+
+
+typedef struct {
+    list_head_t list;
+    char *key;
+    char *value;
+} test_pnode_t;
 
 typedef struct {
     char *method;
@@ -18,7 +26,29 @@ typedef struct {
     char *args;
     char *cookies;
     char *request_body;
+
+    list_head_t headers_head;
+    list_head_t vars_head;
+    list_head_t mzs_head;
 } test_config_t;
+
+static void *test_config_create(void)
+{
+    test_config_t *new = NULL;
+
+    if ((new = malloc(sizeof(test_config_t))) == NULL) {
+        log_error("Error: malloc");
+        return NULL;
+    }
+
+    memset(new, 0, sizeof(test_config_t));
+
+    INIT_LIST_HEAD(&(new->headers_head));
+    INIT_LIST_HEAD(&(new->vars_head));
+    INIT_LIST_HEAD(&(new->mzs_head));
+
+    return new;
+}
 
 static void test_config_free(test_config_t *cfg)
 {
@@ -167,7 +197,13 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
         return -1;
     }
 
+    /* TODO */
+
     /* load header */
+
+    /* load vars */
+
+    /* load mzs */
 
 out:
 
@@ -222,26 +258,31 @@ int main()
 
     void *data;
 
-    test_config_t cfg;
+    test_config_t *cfg;
 
-    memset(&cfg, 0, sizeof(cfg));
+    if ((cfg = test_config_create()) == NULL) {
+        rc = -1;
+        goto out;
+    }
         
-    if (test_load_config(&cfg, testconf, &data) == -1) {
+    if (test_load_config(cfg, testconf, &data) == -1) {
         rc = -1;
         goto out;
     }
 
-    test_config_show(&cfg);
+    test_config_show(cfg);
 
     if (data == NULL) {
         log_error("Error: data is NULL!");
         goto out;
     }
 
+
+    /* TODO */
 #if 0
-        char *tmp = "tmp12\%203abc";
+    char *tmp = "tmp12\%203abc";
     if (waf_data_add_param(data,
-            PARAM_HDR_TYPE,
+                PARAM_HDR_TYPE,
             "tmp", strlen(tmp),
             tmp , strlen(tmp)) == -1) {
         fprintf(stderr, "Error: waf_data_add_param ua error.");
@@ -309,7 +350,7 @@ out:
         fclose(log_fp);
     }
 
-    test_config_free(&cfg);
+    test_config_free(cfg);
 
     return 0;
 }
