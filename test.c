@@ -122,7 +122,7 @@ static void test_config_show(test_config_t *cfg)
     /* TODO show headers & vars & mzs */
     test_config_show_list(&cfg->headers_head, "headers");
     test_config_show_list(&cfg->vars_head, "vars");
-    test_config_to data show_list(&cfg->mzs_head, "mzs");
+    test_config_show_list(&cfg->mzs_head, "mzs");
  }
 
 static int test_get_method(const char *method)
