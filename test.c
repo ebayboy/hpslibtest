@@ -312,23 +312,7 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
         return -1;
     }
 
-    /* add param */
-    if (test_load_config_list_add_param(&cfg->headers_head, PARAM_HDR_TYPE, data) == -1) {
-        log_error("test_load_config_list_add_param headers");
-        return -1;
-    }
-    if (test_load_config_list_add_param(&cfg->vars_head, PARAM_VAR_TYPE, data) == -1) {
-        log_error("test_load_config_list_add_param vars");
-        return -1;
-    }
-    if (test_load_config_list_add_param(&cfg->mzs_head, PARAM_MZ_TYPE, data) == -1) {
-        log_error("test_load_config_list_add_param mzs");
-        return -1;
-    }
-
-    /* load mzs */
-    test_config_show(cfg);
-
+    /* create data */
     *data = waf_data_create(test_get_method(
                 cfg->method), cfg->uri, strlen(cfg->uri), 
             cfg->args, strlen(cfg->args), 
@@ -337,6 +321,22 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
     if (*data == NULL) {
         return -1;
     }
+   /* add param to data */
+    if (test_load_config_list_add_param(&cfg->headers_head, PARAM_HDR_TYPE, *data) == -1) {
+        log_error("test_load_config_list_add_param headers");
+        return -1;
+    }
+    if (test_load_config_list_add_param(&cfg->vars_head, PARAM_VAR_TYPE, *data) == -1) {
+        log_error("test_load_config_list_add_param vars");
+        return -1;
+    }
+    if (test_load_config_list_add_param(&cfg->mzs_head, PARAM_MZ_TYPE, *data) == -1) {
+        log_error("test_load_config_list_add_param mzs");
+        return -1;
+    }
+
+    /* load mzs */
+    test_config_show(cfg);
 
  out:
 
