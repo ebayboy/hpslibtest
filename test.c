@@ -50,6 +50,23 @@ static void *test_config_create(void)
     return new;
 }
 
+static void test_config_free_list(list_head_t *head, const char *name)
+{
+    test_config_node_t *node, *tmp;
+    log_info("free name[%s]", name);
+
+    list_for_each_entry_safe(node, tmp, head, list) {
+        list_del(&node->list); 
+        if (node->key) {
+            free(node->key);
+        }
+        if (node->value) {
+            free(node->value);
+        }
+        free(node);
+    }
+}
+
 static void test_config_free(test_config_t *cfg)
 {
     if (cfg == NULL) {
@@ -67,6 +84,21 @@ static void test_config_free(test_config_t *cfg)
     CFG_FREE(request_body);
 
 #undef CFG_FREE
+
+    /* free headers & vars & mzs */
+    test_config_free_list(&cfg->headers_head, "headers");
+    test_config_free_list(&cfg->vars_head, "vars");
+    test_config_free_list(&cfg->mzs_head, "mzs");
+}
+
+static void test_config_show_list(list_head_t *head, const char *name)
+{
+    test_config_node_t *node;
+
+    log_info("%s:", name);
+    list_for_each_entry(node, head, list) {
+        log_info("key:[%s] value:[%s]", node->key, node->value);
+    }
 }
 
 static void test_config_show(test_config_t *cfg)
@@ -87,7 +119,11 @@ static void test_config_show(test_config_t *cfg)
 
 #undef CFG_PRT
 
-}
+    /* TODO show headers & vars & mzs */
+    test_config_show_list(&cfg->headers_head, "headers");
+    test_config_show_list(&cfg->vars_head, "vars");
+    test_config_show_list(&cfg->mzs_head, "mzs");
+ }
 
 static int test_get_method(const char *method)
 {
@@ -126,6 +162,46 @@ static int test_get_method(const char *method)
     }
 
     return HTTP_UNKNOWN;
+}
+
+static int test_load_config_list(cJSON *root, const char *item_name, list_head_t *head)
+{
+    /* load header */
+    cJSON *headers, *header, *hdr_key, *hdr_value;
+    test_config_node_t *node;
+    int i, size = 0;
+
+    if ((headers = cJSON_GetObjectItem(root,item_name)) != NULL) {
+        size = cJSON_GetArraySize(headers);
+        for (i = 0; i < size; i++) {
+            if ((header  = cJSON_GetArrayItem(headers, i)) == NULL) {
+                continue;
+            }
+            if ((hdr_key = cJSON_GetObjectItem(header, "key")) == NULL) {
+                continue;
+            }
+            if ((hdr_value = cJSON_GetObjectItem(header, "value")) == NULL) {
+                continue;
+            }
+
+            if ((node = malloc(sizeof(test_config_node_t))) == NULL) {
+                log_error("malloc test_config_node_t failed!"); 
+                return -1;
+            }
+            memset(node, 0, sizeof(test_config_node_t));
+            if (hdr_key) {
+                node->key = strdup(hdr_key->valuestring);
+            }
+            if (hdr_value) {
+                node->value = strdup(hdr_value->valuestring);
+            }
+
+            list_add_tail(&node->list, head);
+            log_info("key:%s value:%s", node->key, node->value);
+        }  
+    }
+
+    return 0;
 }
 
 static int test_load_config(test_config_t *cfg, const char *filename, void **data)
@@ -188,42 +264,11 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
 
     /* TODO */
     /* load header */
-    cJSON *headers, *header, *hdr_key, *hdr_value;
-    test_config_node_t *node;
-    if ((headers = cJSON_GetObjectItem(root,"headers")) != NULL) {
-         size = cJSON_GetArraySize(headers);
-         for (i = 0; i < size; i++) {
-             if ((header  = cJSON_GetArrayItem(headers, i)) == NULL) {
-                 continue;
-             }
-             if ((hdr_key = cJSON_GetObjectItem(header, "key")) == NULL) {
-                 continue;
-             }
-             if ((hdr_value = cJSON_GetObjectItem(header, "value")) == NULL) {
-                 continue;
-             }
-
-             if ((node = malloc(sizeof(test_config_node_t))) == NULL) {
-                 log_error("malloc test_config_node_t failed!"); 
-                 return -1;
-             }
-             memset(node, 0, sizeof(test_config_node_t));
-             if (hdr_key) {
-                 node->key = strdup(hdr_key->valuestring);
-             }
-             if (hdr_value) {
-                 node->value = strdup(hdr_value->valuestring);
-             }
-
-             list_add_tail(&node->list, &cfg->headers_head);
-             log_info("key:%s value:%s", node->key, node->value);
-         }  
-    }
-
-    /* load vars */
+    test_load_config_list(root, "headers", &cfg->headers_head);
+    test_load_config_list(root, "vars", &cfg->vars_head);
+    test_load_config_list(root, "mzs", &cfg->mzs_head);
 
     /* load mzs */
-
     test_config_show(cfg);
 
     *data = waf_data_create(test_get_method(
