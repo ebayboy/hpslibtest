@@ -53,7 +53,7 @@ static void *test_config_create(void)
 static void test_config_free_list(list_head_t *head, const char *name)
 {
     test_config_node_t *node, *tmp;
-    log_info("free name[%s]", name);
+    //log_info("free name[%s]", name);
 
     list_for_each_entry_safe(node, tmp, head, list) {
         list_del(&node->list); 
