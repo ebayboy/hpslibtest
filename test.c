@@ -402,7 +402,7 @@ int main()
 
     /* waf match */
     rc = waf_match(data, &matched_rule_id);
-    log_info("rc=%d matched_rule_id:%d\n", rc, matched_rule_id);
+    log_info("Match result : rc=%d matched_rule_id:%d\n", rc, matched_rule_id);
 
 out:
 
