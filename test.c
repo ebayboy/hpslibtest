@@ -204,6 +204,23 @@ static int test_load_config_list(cJSON *root, const char *item_name, list_head_t
     return 0;
 }
 
+static int test_load_config_list_add_param(list_head_t *head,int type, void *data)
+{
+    test_config_node_t *node;
+
+    list_for_each_entry(node, head, list) {
+        if (waf_data_add_param(data,
+                    type, 
+                    node->key, strlen(node->key),
+                    node->value, strlen(node->value)) == -1) {
+            log_error("Error: waf_data_add_param ua error.");
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
 static int test_load_config(test_config_t *cfg, const char *filename, void **data)
 {
     long temp_len = 0;
@@ -264,9 +281,32 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
 
     /* TODO */
     /* load header */
-    test_load_config_list(root, "headers", &cfg->headers_head);
-    test_load_config_list(root, "vars", &cfg->vars_head);
-    test_load_config_list(root, "mzs", &cfg->mzs_head);
+    if (test_load_config_list(root, "headers", &cfg->headers_head) == -1) {
+        log_error("test_load_config_list headers");
+        return -1;
+    }
+    if (test_load_config_list(root, "vars", &cfg->vars_head) == -1) {
+        log_error("test_load_config_list vars");
+        return -1;
+    }
+    if (test_load_config_list(root, "mzs", &cfg->mzs_head) == -1) {
+        log_error("test_load_config_list mzs");
+        return -1;
+    }
+
+    /* add param */
+    if (test_load_config_list_add_param(&cfg->headers_head, PARAM_HDR_TYPE, data) == -1) {
+        log_error("test_load_config_list_add_param headers");
+        return -1;
+    }
+    if (test_load_config_list_add_param(&cfg->headers_head, PARAM_VAR_TYPE, data) == -1) {
+        log_error("test_load_config_list_add_param vars");
+        return -1;
+    }
+    if (test_load_config_list_add_param(&cfg->headers_head, PARAM_MZ_TYPE, data) == -1) {
+        log_error("test_load_config_list_add_param mzs");
+        return -1;
+    }
 
     /* load mzs */
     test_config_show(cfg);
