@@ -456,22 +456,32 @@ int get_option (
         int c;
 
         //注意这里的冒号，有冒号就需要加参数值，没有冒号就不用加参数值
-        //c = getopt_long (argc, argv, "c:l:t:h", long_options, &option_index);	
-        c = getopt_long (argc, argv, "clth", long_options, &option_index);	
+        c = getopt_long (argc, argv, "c:l:t:h", long_options, &option_index);	
         if (c == -1)
             break;
 
         switch (c) {
             case 'c':
-                printf ("Input config file\n");
+                printf ("Input config file:[%s]\n", optarg);
+                if (strlen(optarg) > 4096) {
+                    log_error("max len 4095");
+                    return -1;
+                }
+                strcpy(config, optarg);
                 break;
 
             case 'l':
-                printf ("Input log file\n");
+                printf ("Input log file:[%s]\n", optarg);
+                if (strlen(optarg) > 4096) {
+                    log_error("max len 4095");
+                    return -1;
+                }
+                strcpy(log, optarg);
                 break;
 
             case 't':
-                printf ("Input test file\n");
+                printf ("Input test file:[%s]\n", optarg);
+                strcpy(test, optarg);
                 break;
 
             case 'h':
