@@ -355,14 +355,17 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
     return ret;
 }
 
-
-int main()
+int main(int argv, char **args)
 {
     char *filename="hpslib.json";
     char *testconf="test.json";
     char *log_file="/var/log/waf_test.log";
     int rc = 0;
     FILE *log_fp = NULL;
+
+    log_info("lib config file:[%s]", filename);
+    log_info("test config file:[%s]", testconf);
+    log_info("log file:[%s]", log_file);
 
     /* init log */
     if ((log_fp = fopen(log_file, "a+")) == NULL) {
