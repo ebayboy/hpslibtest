@@ -171,35 +171,53 @@ static int test_load_config_list(cJSON *root, const char *item_name, list_head_t
     test_config_node_t *node;
     int i, size = 0;
 
-    if ((headers = cJSON_GetObjectItem(root,item_name)) != NULL) {
-        size = cJSON_GetArraySize(headers);
-        for (i = 0; i < size; i++) {
-            if ((header  = cJSON_GetArrayItem(headers, i)) == NULL) {
-                continue;
-            }
-            if ((hdr_key = cJSON_GetObjectItem(header, "key")) == NULL) {
-                continue;
-            }
-            if ((hdr_value = cJSON_GetObjectItem(header, "value")) == NULL) {
-                continue;
-            }
-
-            if ((node = malloc(sizeof(test_config_node_t))) == NULL) {
-                log_error("malloc test_config_node_t failed!"); 
-                return -1;
-            }
-            memset(node, 0, sizeof(test_config_node_t));
-            if (hdr_key) {
-                node->key = strdup(hdr_key->valuestring);
-            }
-            if (hdr_value) {
-                node->value = strdup(hdr_value->valuestring);
-            }
-
-            list_add_tail(&node->list, head);
-            log_info("key:%s value:%s", node->key, node->value);
-        }  
+    if (root == NULL || item_name == NULL || head == NULL) {
+        log_error("input check error!");
+        return -1;
     }
+
+    if (list_empty(head)) {
+        log_info("[%s] is empty!", item_name);
+    }
+
+    if ((headers = cJSON_GetObjectItem(root,item_name)) == NULL) {
+        log_info("headers null, continue");
+        return 0;
+    }
+
+    size = cJSON_GetArraySize(headers);
+    for (i = 0; i < size; i++) {
+        if ((header  = cJSON_GetArrayItem(headers, i)) == NULL) {
+            continue;
+        }
+        if ((hdr_key = cJSON_GetObjectItem(header, "key")) == NULL) {
+            continue;
+        }
+        if ((hdr_value = cJSON_GetObjectItem(header, "value")) == NULL) {
+            continue;
+        }
+
+        if ((node = malloc(sizeof(test_config_node_t))) == NULL) {
+            log_error("malloc test_config_node_t failed!"); 
+            return -1;
+        }
+        memset(node, 0, sizeof(test_config_node_t));
+
+        if (hdr_key) {
+            node->key = strdup(hdr_key->valuestring);
+        }
+        if (hdr_value) {
+            node->value = strdup(hdr_value->valuestring);
+        }
+
+#if 0
+        list_head_t head1;
+        INIT_LIST_HEAD(&head1);
+#endif
+
+        list_add_tail(&node->list, head);
+        log_info("key:%s value:%s", node->key, node->value);
+    }  
 
     return 0;
 }
@@ -299,11 +317,11 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
         log_error("test_load_config_list_add_param headers");
         return -1;
     }
-    if (test_load_config_list_add_param(&cfg->headers_head, PARAM_VAR_TYPE, data) == -1) {
+    if (test_load_config_list_add_param(&cfg->vars_head, PARAM_VAR_TYPE, data) == -1) {
         log_error("test_load_config_list_add_param vars");
         return -1;
     }
-    if (test_load_config_list_add_param(&cfg->headers_head, PARAM_MZ_TYPE, data) == -1) {
+    if (test_load_config_list_add_param(&cfg->mzs_head, PARAM_MZ_TYPE, data) == -1) {
         log_error("test_load_config_list_add_param mzs");
         return -1;
     }
