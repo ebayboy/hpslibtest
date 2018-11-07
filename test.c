@@ -18,7 +18,7 @@ typedef struct {
     list_head_t list;
     char *key;
     char *value;
-} test_pnode_t;
+} test_config_node_t;
 
 typedef struct {
     char *method;
@@ -133,8 +133,8 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
     long temp_len = 0;
     FILE *fp = NULL;
     char *temp = NULL;
-    cJSON *root = NULL, *it = NULL;
-    int ret = 0;
+    cJSON *root = NULL, *it = NULL, *it_sub;
+    int ret = 0, size = 0, i;
 
     if (filename == NULL || strlen(filename) == 0) {
         return -1;
@@ -186,6 +186,44 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
         cfg->request_body = strdup(it->valuestring);
     }
 
+    /* TODO */
+    /* load header */
+    cJSON *headers, *header, *hdr_key, *hdr_value;
+    test_config_node_t *node;
+    if ((headers = cJSON_GetObjectItem(root,"headers")) != NULL) {
+         size = cJSON_GetArraySize(headers);
+         for (i = 0; i < size; i++) {
+             if ((header  = cJSON_GetArrayItem(headers, i)) == NULL) {
+                 continue;
+             }
+             if ((hdr_key = cJSON_GetObjectItem(header, "key")) == NULL) {
+                 continue;
+             }
+             if ((hdr_value = cJSON_GetObjectItem(header, "value")) == NULL) {
+                 continue;
+             }
+
+             if ((node = malloc(sizeof(test_config_node_t))) == NULL) {
+                 log_error("malloc test_config_node_t failed!"); 
+                 return -1;
+             }
+             memset(node, 0, sizeof(test_config_node_t));
+             if (hdr_key) {
+                 node->key = strdup(hdr_key->valuestring);
+             }
+             if (hdr_value) {
+                 node->value = strdup(hdr_value->valuestring);
+             }
+
+             list_add_tail(&node->list, &cfg->headers_head);
+             log_info("key:%s value:%s", node->key, node->value);
+         }  
+    }
+
+    /* load vars */
+
+    /* load mzs */
+
     test_config_show(cfg);
 
     *data = waf_data_create(test_get_method(
@@ -197,15 +235,7 @@ static int test_load_config(test_config_t *cfg, const char *filename, void **dat
         return -1;
     }
 
-    /* TODO */
-
-    /* load header */
-
-    /* load vars */
-
-    /* load mzs */
-
-out:
+ out:
 
     if (fp) {
         fclose(fp);
