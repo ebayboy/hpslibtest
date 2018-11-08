@@ -1,9 +1,9 @@
 {
-    "method"  : "HTTP_GET",  
-    "args"  : "args1",  
-    "uri"  : "uri1",
+    "method"  : "HTTP_POST",  
+    "args"  : "aa=bb&cc=dd",  
+    "uri"  : "/foo/fanpf/",
     "request_body"      : "request_body1",
-    "cookies"      : "cookies1",
+    "cookies"      : "a=121;b=122;c=123",
 
     "headers": 
     [
@@ -21,11 +21,7 @@
     [
         {   
             "key": "url",
-            "value": "http://192.168.137.200/?key1=v al1&key2=val2"
-        },
-        {   
-            "key": "u_url",
-            "value": "http://192.168.137.200/?key1=v%20al1&key2=val2"
+            "value": "http://192.168.137.200/foo/?key1=v%20al1&key2=val2"
         },
         {   
             "key": "request_uri",
@@ -41,7 +37,7 @@
         },
         {   
             "key": "$u_url",
-            "value": "u_url"
+            "value": "url"
         },
         {   
             "key": "$http_referer",
