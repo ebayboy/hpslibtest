@@ -413,9 +413,6 @@ test_load_config (test_config_t * cfg, const char *config, void **data)
         return -1;
     }
 
-    /* load mzs */
-    test_config_show (cfg);
-
 out:
 
     if (fp)
