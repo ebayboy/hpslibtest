@@ -1,8 +1,4 @@
 {
-    "WafEngine"  : "on",  
-    "WafAction"  : "block",
-    "WafId"      : "abcdefg",
-
     "SecRule": 
     {
         "Rules": 
