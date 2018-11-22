@@ -5,8 +5,8 @@
         [
             {   
                 "id": "10022",
-                "mz": "$uri",
-                "rx": "fanpf"
+                "mz": "$uri, $user_agent",
+                "rx"  : "/etc/(passwd|shadow|rc|boot)"
             }
         ]
     }

@@ -24,7 +24,7 @@ int main()
     /* waf data */
     //char *uri = "http://192.168.137.200/?name=/etc/passwd";
     char *args = "";
-    char *uri = "http://192.168.137.200/";
+    char *uri = "http://192.168.137.200/etc/passwd";
     char *request_body = "a=1122 3344&c=d";
     //char *cookies = "a=1122%203344;c=d;";
     char *cookies = "";
@@ -40,7 +40,6 @@ int main()
         goto out;
     }
 
-#if 0
     /* add header */
     char *ua = "1122\%20334455";
     if (waf_data_add_param(data,
@@ -79,7 +78,6 @@ int main()
         fprintf(stderr, "Error: waf_data_add_param referer var error.");
         goto out;
     }
-#endif
 
     /* waf data show */
     waf_data_show(data);
