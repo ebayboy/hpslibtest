@@ -41,11 +41,11 @@ int main()
     }
 
     /* add header */
-    char *ua = "1122\%20334455";
+    char *user_agent = "11/etc/passwd1111";
     if (waf_data_add_param(data,
                 PARAM_HDR_TYPE,
                 WAF_HDR_UA, strlen(WAF_HDR_UA),
-                ua , strlen(ua)) == -1) {
+                user_agent , strlen(user_agent)) == -1) {
         fprintf(stderr, "Error: waf_data_add_param ua error.");
         goto out;
     }
